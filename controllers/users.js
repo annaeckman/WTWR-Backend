@@ -1,7 +1,5 @@
 const User = require("../models/user");
 
-//GET /users
-
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -27,9 +25,9 @@ const createUser = (req, res) => {
 
 const getUser = (req, res) => {
   const { userId } = req.params;
+
   User.findById(userId)
     .then((user) => res.status(200).send(user))
-    .orFail()
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
