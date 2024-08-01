@@ -74,9 +74,8 @@ const unlikeItem = (req, res) => {
         return res.status(404).send({ message: err.message });
       } else if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: "Error from unlikeItem", err });
       }
+      return res.status(500).send({ message: "Error from unlikeItem", err });
     });
 };
 
