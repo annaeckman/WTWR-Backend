@@ -3,13 +3,17 @@ const ClothingItem = require("../models/clothingItem");
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       console.log(item);
       res.send({ data: item });
     })
     .catch((err) => {
-      res.status(500).send({ message: "Error from createItem", err });
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return res.status(400).send({ message: err.message });
+      }
+      return res.status(500).send({ message: "error from createItem" });
     });
 };
 
@@ -23,13 +27,18 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-
-  console.log(itemId);
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(204).send({}))
+    .then((item) => res.status(200).send({ item }))
     .catch((err) => {
-      res.status(500).send({ message: "Error from deleteItem", err });
+      console.log(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: "Error from deleteItem", err });
+      }
     });
 };
 
