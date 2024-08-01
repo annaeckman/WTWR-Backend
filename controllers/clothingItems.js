@@ -5,7 +5,6 @@ const createItem = (req, res) => {
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
-      console.log(item);
       res.send({ data: item });
     })
     .catch((err) => {
@@ -34,7 +33,8 @@ const deleteItem = (req, res) => {
       console.log(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: "Error from deleteItem", err });
@@ -53,7 +53,8 @@ const likeItem = (req, res) => {
       console.log(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: "Error from likeItem", err });
@@ -72,7 +73,8 @@ const unlikeItem = (req, res) => {
       console.log(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: "Error from unlikeItem", err });
