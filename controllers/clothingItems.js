@@ -36,9 +36,8 @@ const deleteItem = (req, res) => {
         return res.status(404).send({ message: err.message });
       } else if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: "Error from deleteItem", err });
       }
+      return res.status(500).send({ message: "Error from deleteItem", err });
     });
 };
 
@@ -56,9 +55,8 @@ const likeItem = (req, res) => {
         return res.status(404).send({ message: err.message });
       } else if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: "Error from likeItem", err });
       }
+      return res.status(500).send({ message: "Error from likeItem", err });
     });
 };
 
@@ -82,7 +80,7 @@ const unlikeItem = (req, res) => {
     });
 };
 
-//Update, may need this for a future sprint
+// Update, may need this for a future sprint
 // const updateItem = (req, res) => {
 //   const { itemId } = req.params;
 //   const { imageUrl } = req.body;
