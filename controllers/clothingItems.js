@@ -42,6 +42,46 @@ const deleteItem = (req, res) => {
     });
 };
 
+const likeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ item }))
+    .catch((err) => {
+      console.log(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: "Error from likeItem", err });
+      }
+    });
+};
+
+const unlikeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $pull: { likes: req.user._id } }, // remove _id from the array
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ item }))
+    .catch((err) => {
+      console.log(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: "Error from unlikeItem", err });
+      }
+    });
+};
+
 //Update, may need this for a future sprint
 // const updateItem = (req, res) => {
 //   const { itemId } = req.params;
@@ -55,4 +95,4 @@ const deleteItem = (req, res) => {
 //     });
 // };
 
-module.exports = { createItem, getItems, deleteItem };
+module.exports = { createItem, getItems, deleteItem, likeItem, unlikeItem };
