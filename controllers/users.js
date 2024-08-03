@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const { BAD_REQUEST, NOT_FOUND, DEFAULT } = require("../utils/errors");
-const SUCCESSFUL_REQUEST = 201;
+const { SUCCESSFUL_REQUEST } = require("../utils/status");
 
 const getUsers = (req, res) => {
   User.find({})
