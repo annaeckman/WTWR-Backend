@@ -22,7 +22,7 @@ const createItem = (req, res) => {
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
-    .catch((err) => {
+    .catch(() => {
       res
         .status(DEFAULT)
         .send({ message: "An error has occurred on the server" });
@@ -35,7 +35,6 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => res.send({ item }))
     .catch((err) => {
-      console.log(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: err.message });
       }
@@ -57,7 +56,6 @@ const likeItem = (req, res) => {
     .orFail()
     .then((item) => res.send({ item }))
     .catch((err) => {
-      console.log(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: err.message });
       }
@@ -79,7 +77,6 @@ const unlikeItem = (req, res) => {
     .orFail()
     .then((item) => res.send({ item }))
     .catch((err) => {
-      console.log(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: err.message });
       }
