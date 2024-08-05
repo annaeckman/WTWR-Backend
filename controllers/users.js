@@ -8,7 +8,7 @@ const getUsers = (req, res) => {
     .catch((err) => {
       console.error(err);
       return res
-        .status(500)
+        .status(DEFAULT)
         .send({ message: "An error has occurred on the server" });
     });
 };
