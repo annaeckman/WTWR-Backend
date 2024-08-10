@@ -1,5 +1,10 @@
 const User = require("../models/user");
-const { BAD_REQUEST, NOT_FOUND, DEFAULT } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  DEFAULT,
+  CONFLICT,
+} = require("../utils/errors");
 const { SUCCESSFUL_REQUEST } = require("../utils/status");
 
 const getUsers = (req, res) => {
@@ -14,18 +19,39 @@ const getUsers = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar })
-    .then((user) => res.status(SUCCESSFUL_REQUEST).send(user))
+  User.findOne({ email })
+    .then((existingUser) => {
+      if (existingUser) {
+        throw new Error("Email already in use");
+      }
+      return bcrypt.hash(password, 10);
+    })
+    .then((hash) => {
+      return User.create({ name, avatar, email, password: hash }).then(
+        (newUser) => {
+          const response = newUser.toObject();
+          delete response.password;
+
+          res.status(SUCCESSFUL_REQUEST).send({ data: response });
+        }
+      );
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data" });
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
+      if (err.message === "Email already in use") {
+        return res
+          .status(CONFLICT)
+          .send({ message: "An account exists already with this email" });
+      } else {
+        res
+          .status(DEFAULT)
+          .send({ message: "An error has occurred on the server" });
+      }
     });
 };
 
