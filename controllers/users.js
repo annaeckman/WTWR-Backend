@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const {
   BAD_REQUEST,
   NOT_FOUND,
@@ -97,7 +98,7 @@ const loginUser = (req, res) => {
         expiresIn: "7d",
       });
 
-      res.status(SUCCESSFUL_REQUEST).send({ token });
+      res.send({ token });
     })
     .catch((err) => {
       console.error("Login error:", err.name);
