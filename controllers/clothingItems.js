@@ -31,10 +31,25 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  ClothingItem.findByIdAndDelete(itemId)
+  const userId = req.user._id;
+
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((item) => res.send({ item }))
+    .then((item) => {
+      if (item.owner.toString() !== userId) {
+        const error = new Error();
+        error.name = "Access Denied";
+        throw error;
+      }
+      return ClothingItem.findByIdAndDelete(itemId);
+    })
+    .then((item) => res.send(item))
     .catch((err) => {
+      if (err.name === "Access Denied") {
+        return res
+          .status(403)
+          .send({ message: "You are unauthorized to delete this item" });
+      }
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: err.message });
       }
@@ -89,17 +104,24 @@ const unlikeItem = (req, res) => {
     });
 };
 
-// Update, may need this for a future sprint
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
+// Update Item
+const updateItem = (req, res) => {
+  const { itemId } = req.params;
+  const { imageUrl } = req.body;
 
-//   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.status(200).send({ data: item }))
-//     .catch((err) => {
-//       res.status(500).send({ message: "Error from updateItem", err });
-//     });
-// };
+  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((err) => {
+      res.status(500).send({ message: "Error from updateItem", err });
+    });
+};
 
-module.exports = { createItem, getItems, deleteItem, likeItem, unlikeItem };
+module.exports = {
+  createItem,
+  getItems,
+  deleteItem,
+  likeItem,
+  unlikeItem,
+  updateItem,
+};

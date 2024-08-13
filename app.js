@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
+const cors = require("cors");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -10,16 +11,12 @@ mongoose
   .then(() => {})
   .catch(console.error);
 
-// Authorization middleware
-app.use((req, res, next) => {
-  req.user = {
-    _id: "66a9305ce7d59abc4f717ed2",
-  };
-  next();
-});
-
 // JSON parsing middleware
 app.use(express.json());
+
+//cors
+app.use(cors());
+
 // Main router
 app.use("/", mainRouter);
 

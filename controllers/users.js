@@ -79,7 +79,11 @@ const loginUser = (req, res) => {
       .send({ message: "Invalid email or password" });
   }
 
-  return User.findUserByCredentials(email, password)
+  if (!validator.isEmail(email)) {
+    return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
+  }
+
+  User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         return res
@@ -102,6 +106,11 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       console.error("Login error:", err.name);
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "Invalid email or password" });
+      }
       res.status(DEFAULT).send({
         message:
           "Internal server error from the catch in login controller" + err,
@@ -109,10 +118,8 @@ const loginUser = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
+const getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -129,4 +136,41 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser, loginUser };
+const updateUser = (req, res) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: req.body.name, avatar: req.body.avatar },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((user) =>
+      res.send({
+        data: {
+          name: req.body.name,
+          avatar: req.body.avatar,
+          email: req.body.email,
+          password: req.body.password,
+        },
+      })
+    )
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        console.error(err);
+        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: err.message });
+      }
+      return res
+        .status(DEFAULT)
+        .send({ message: "An error has occurred on the server" });
+    });
+};
+
+module.exports = {
+  getUsers,
+  createUser,
+  getCurrentUser,
+  loginUser,
+  updateUser,
+};
