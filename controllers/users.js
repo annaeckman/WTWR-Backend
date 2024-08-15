@@ -1,7 +1,8 @@
-const User = require("../models/user");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const validator = require("validator");
+const User = require("../models/user");
+
 const {
   BAD_REQUEST,
   NOT_FOUND,
@@ -26,17 +27,17 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  //Check if email is missing
+  // Check if email is missing
   if (!email) {
     return res.status(BAD_REQUEST).send({ message: "Email is required" });
   }
 
-  //Validate email format
+  // Validate email format
   if (!validator.isEmail(email)) {
     return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
   }
 
-  User.findOne({ email })
+  return User.findOne({ email })
     .then((existingUser) => {
       if (existingUser) {
         throw new Error("Email already in use");
@@ -44,14 +45,12 @@ const createUser = (req, res) => {
       return bcrypt.hash(password, 10);
     })
     .then((hash) => {
-      return User.create({ name, avatar, email, password: hash }).then(
-        (newUser) => {
-          const response = newUser.toObject();
-          delete response.password;
+      User.create({ name, avatar, email, password: hash }).then((newUser) => {
+        const response = newUser.toObject();
+        delete response.password;
 
-          res.status(SUCCESSFUL_REQUEST).send({ data: response });
-        }
-      );
+        return res.status(SUCCESSFUL_REQUEST).send({ data: response });
+      });
     })
     .catch((err) => {
       console.error(err);
@@ -62,11 +61,10 @@ const createUser = (req, res) => {
         return res
           .status(CONFLICT)
           .send({ message: "An account exists already with this email" });
-      } else {
-        res
-          .status(DEFAULT)
-          .send({ message: "An error has occurred on the server" });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -83,7 +81,7 @@ const loginUser = (req, res) => {
     return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         return res
@@ -102,7 +100,7 @@ const loginUser = (req, res) => {
         expiresIn: "7d",
       });
 
-      res.send({ token });
+      return res.send({ token });
     })
     .catch((err) => {
       console.error("Login error:", err.name);
@@ -111,9 +109,8 @@ const loginUser = (req, res) => {
           .status(UNAUTHORIZED)
           .send({ message: "Invalid email or password" });
       }
-      res.status(DEFAULT).send({
-        message:
-          "Internal server error from the catch in login controller" + err,
+      return res.status(DEFAULT).send({
+        message: "Internal server error from the catch in login controller",
       });
     });
 };
@@ -143,7 +140,7 @@ const updateUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail()
-    .then((user) =>
+    .then(() =>
       res.send({
         data: {
           name: req.body.name,
