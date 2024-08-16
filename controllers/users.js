@@ -13,17 +13,6 @@ const {
 const { SUCCESSFUL_REQUEST } = require("../utils/status");
 const { JWT_SECRET } = require("../utils/config");
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
-
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
@@ -83,19 +72,6 @@ const loginUser = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        return res
-          .status(UNAUTHORIZED)
-          .send({ message: "Invalid email or password" });
-      }
-
-      if (!user._id || !JWT_SECRET) {
-        console.error("user._id or JWT_SECRET is undefined");
-        return res.status(DEFAULT).send({
-          message: "Internal server error from not userid or not JWT",
-        });
-      }
-
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
@@ -140,16 +116,7 @@ const updateUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail()
-    .then(() =>
-      res.send({
-        data: {
-          name: req.body.name,
-          avatar: req.body.avatar,
-          email: req.body.email,
-          password: req.body.password,
-        },
-      })
-    )
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === "ValidationError") {
         console.error(err);
