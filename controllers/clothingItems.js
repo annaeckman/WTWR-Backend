@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
-const { BAD_REQUEST, NOT_FOUND, DEFAULT } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  DEFAULT,
+  FORBIDDEN,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -47,7 +52,7 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       if (err.name === "Access Denied") {
         return res
-          .status(403)
+          .status(FORBIDDEN)
           .send({ message: "You are unauthorized to delete this item" });
       }
       if (err.name === "DocumentNotFoundError") {
@@ -104,24 +109,10 @@ const unlikeItem = (req, res) => {
     });
 };
 
-// Update Item
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      res.status(500).send({ message: "Error from updateItem", err });
-    });
-};
-
 module.exports = {
   createItem,
   getItems,
   deleteItem,
   likeItem,
   unlikeItem,
-  updateItem,
 };
