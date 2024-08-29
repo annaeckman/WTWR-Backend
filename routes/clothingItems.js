@@ -7,7 +7,6 @@ const {
   deleteItem,
   likeItem,
   unlikeItem,
-  updateItem,
 } = require("../controllers/clothingItems");
 
 // CRUD
@@ -19,9 +18,6 @@ router.use(auth);
 
 // Create
 router.post("/", createItem);
-
-// Update
-router.put("/:itemId", updateItem);
 
 // Delete
 router.delete("/:itemId", deleteItem);
