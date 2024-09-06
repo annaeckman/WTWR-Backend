@@ -50,6 +50,7 @@ const deleteItem = (req, res) => {
     })
     .then((item) => res.send(item))
     .catch((err) => {
+      console.error(err);
       if (err.name === "Access Denied") {
         return res
           .status(FORBIDDEN)
