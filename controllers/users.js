@@ -9,7 +9,7 @@ const {
   DEFAULT,
   CONFLICT,
   UNAUTHORIZED,
-} = require("../utils/errors/errors");
+} = require("../utils/errors");
 const { SUCCESSFUL_REQUEST } = require("../utils/status");
 const { JWT_SECRET } = require("../utils/config");
 
