@@ -4,7 +4,8 @@ const {
   NOT_FOUND,
   DEFAULT,
   FORBIDDEN,
-} = require("../utils/errors");
+} = require("../utils/errors/errors");
+const NotFoundError = require("../utils/errors/not-found-err");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -17,10 +18,13 @@ const createItem = (req, res) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
+      //   return res
+      //     .status(DEFAULT)
+      //     .send({ message: "An error has occurred on the server" });
+      // });
     });
 };
 
