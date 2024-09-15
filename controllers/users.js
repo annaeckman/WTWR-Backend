@@ -60,9 +60,7 @@ const loginUser = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "Invalid email or password" });
+    return next(new BadRequestError("Invalid email or password"));
   }
 
   if (!validator.isEmail(email)) {

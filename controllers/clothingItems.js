@@ -15,7 +15,7 @@ const createItem = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return next(new BadRequestError("Invalid data provided"));
+        next(new BadRequestError("Invalid data provided"));
       } else {
         next(err);
       }
