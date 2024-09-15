@@ -4,12 +4,12 @@ const validator = require("validator");
 const User = require("../models/user");
 
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  DEFAULT,
-  CONFLICT,
-  UNAUTHORIZED,
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
 } = require("../utils/errors");
+
 const { SUCCESSFUL_REQUEST } = require("../utils/status");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -18,12 +18,12 @@ const createUser = (req, res) => {
 
   // Check if email is missing
   if (!email) {
-    return res.status(BAD_REQUEST).send({ message: "Email is required" });
+    return next(new BadRequestError("Email is required"));
   }
 
   // Validate email format
   if (!validator.isEmail(email)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
+    return next(new BadRequestError("Invalid email format"));
   }
 
   return User.findOne({ email })
@@ -44,16 +44,15 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.message === "Email already in use") {
-        return res
-          .status(CONFLICT)
-          .send({ message: "An account exists already with this email" });
+        return next(
+          new ConflictError("An account exists already with this email")
+        );
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -67,7 +66,7 @@ const loginUser = (req, res) => {
   }
 
   if (!validator.isEmail(email)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid email format" });
+    return next(new BadRequestError("Invalid email format"));
   }
 
   return User.findUserByCredentials(email, password)
@@ -79,15 +78,12 @@ const loginUser = (req, res) => {
       return res.send({ token });
     })
     .catch((err) => {
-      console.error("Login error:", err.name);
+      console.error(err);
       if (err.message === "Incorrect email or password") {
-        return res
-          .status(UNAUTHORIZED)
-          .send({ message: "Invalid email or password" });
+        return next(new UnauthorizedError("Invalid email or password"));
+      } else {
+        next(err);
       }
-      return res.status(DEFAULT).send({
-        message: "Internal server error from the catch in login controller",
-      });
     });
 };
 
@@ -98,14 +94,13 @@ const getCurrentUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: err.message });
+        return next(new NotFoundError("Item not found"));
       }
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+        return next(new BadRequestError("Invalid data provided"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -118,16 +113,15 @@ const updateUser = (req, res) => {
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
+      console.error(err);
       if (err.name === "ValidationError") {
-        console.error(err);
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: err.message });
+        return next(new NotFoundError("Item not found"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occurred on the server" });
     });
 };
 
