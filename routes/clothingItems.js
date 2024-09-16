@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
-
 const {
   createItem,
   getItems,
@@ -8,6 +7,7 @@ const {
   likeItem,
   unlikeItem,
 } = require("../controllers/clothingItems");
+const { validateCardBody } = require("../middlewares/validation");
 
 // CRUD
 
@@ -17,7 +17,7 @@ router.get("/", getItems);
 router.use(auth);
 
 // Create
-router.post("/", createItem);
+router.post("/", validateCardBody, createItem);
 
 // Delete
 router.delete("/:itemId", deleteItem);

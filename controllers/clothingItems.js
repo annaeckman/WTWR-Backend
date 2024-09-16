@@ -35,12 +35,16 @@ const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
+  // could change line 40 to return the clothingItem promise, and then throw the errors instead
+  // of returning them...different way of causing express to detect an error was thrown
+  // express was not built with promises, added ability to handle promises but you need to explicitly
+  // handle the ways...it doesn't support making deleteItem asynchronous
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== userId) {
-        return next(
-          new ForbiddenError("You do not have permission to delete this item")
+        throw new ForbiddenError(
+          "You do not have permission to delete this item"
         );
       }
       return ClothingItem.findByIdAndDelete(itemId);
