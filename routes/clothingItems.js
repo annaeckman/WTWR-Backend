@@ -7,7 +7,10 @@ const {
   likeItem,
   unlikeItem,
 } = require("../controllers/clothingItems");
-const { validateCardBody } = require("../middlewares/validation");
+const {
+  validateCardBody,
+  validateIdParams,
+} = require("../middlewares/validation");
 
 // CRUD
 
@@ -20,12 +23,12 @@ router.use(auth);
 router.post("/", validateCardBody, createItem);
 
 // Delete
-router.delete("/:itemId", deleteItem);
+router.delete("/:itemId", validateIdParams, deleteItem);
 
 // like an item
-router.put("/:itemId/likes", likeItem);
+router.put("/:itemId/likes", validateIdParams, likeItem);
 
 // unlike an item
-router.delete("/:itemId/likes", unlikeItem);
+router.delete("/:itemId/likes", validateIdParams, unlikeItem);
 
 module.exports = router;
