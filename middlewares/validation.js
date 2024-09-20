@@ -81,16 +81,6 @@ module.exports.validateUpdateBody = celebrate({
   }),
 });
 
-// IDs must be a hexadecimal value length of 24 characters:
-// there's no built in fn, better to use a validator from mongoose library,
-// mongoose.types.objectid.isvalid (google for correct capitalization) will tell me
-//if it's hex value 24 characters all object ids are hex 24,
-// module.exports.validateIdBody = celebrate({
-//   body: Joi.object().keys({
-//     _id: mongoose.isValidObjectId(),
-//   }),
-// });
-
 module.exports.validateIdParams = celebrate({
   params: Joi.object().keys({
     itemId: Joi.string().hex().length(24).required().messages({
@@ -100,21 +90,3 @@ module.exports.validateIdParams = celebrate({
     }),
   }),
 });
-
-// module.exports.validateIdParams = celebrate({
-//   [Segments.PARAMS]: Joi.object().keys({
-//     itemId: Joi.string().custom(validateObjectId, 'ObjectId Validation').required().messages({
-//       'any.invalid': 'Invalid item ID format',
-//       'any.required': 'Item ID is required',
-//     }),
-//   }),
-// });
-
-// On top of validating the request body, celebrate also **allows you to
-// validate headers, parameters, or req.query. Use parameters to extract
-// and validate the item and user IDs
-// const validateId = celebrate({
-//   params: Joi.object().keys({
-//     // ...
-//   }),
-// });
