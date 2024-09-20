@@ -21,6 +21,12 @@ app.use(express.json());
 // cors
 app.use(cors());
 
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 // Main router
 app.use("/", mainRouter);
 

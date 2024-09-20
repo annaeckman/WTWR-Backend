@@ -18,3 +18,9 @@ Node.JS
 REST API
 Custom Mongoose Models
 bcryptjs
+
+### Domain name
+
+wtwrwtwr.jumpingcrab.com
+www.wtwrwtwr.jumpingcrab.com
+api.wtwrwtwr.jumpingcrab.com
