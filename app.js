@@ -5,7 +5,7 @@ const mainRouter = require("./routes/index");
 const { errors } = require("celebrate");
 const errorHandler = require("./middlewares/error-handler");
 require("dotenv").config();
-// const { requestLogger, errorLogger } = require("./middlewares/logger");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -24,11 +24,9 @@ app.use(cors());
 // Main router
 app.use("/", mainRouter);
 
-// app.use(requestLogger);
-// app.use(routes);
-
+// Error handing middleware
 app.use(errors());
-
+app.use(requestLogger);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
