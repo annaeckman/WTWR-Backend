@@ -1,9 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} = require("../utils/errors");
+const { BadRequestError } = require("../utils/BadRequestError");
+const { ForbiddenError } = require("../utils/ForbiddenError");
+const { NotFoundError } = require("../utils/NotFoundError");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
@@ -25,20 +23,13 @@ const createItem = (req, res, next) => {
 const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
-    .catch((err) => {
-      console.error(err);
-      next(err);
-    });
+    .catch(next);
 };
 
 const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user._id;
 
-  // could change line 40 to return the clothingItem promise, and then throw the errors instead
-  // of returning them...different way of causing express to detect an error was thrown
-  // express was not built with promises, added ability to handle promises but you need to explicitly
-  // handle the ways...it doesn't support making deleteItem asynchronous
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
@@ -52,11 +43,6 @@ const deleteItem = (req, res, next) => {
     .then((item) => res.send(item))
     .catch((err) => {
       console.error(err);
-      if (err.name === "Access Denied") {
-        return next(
-          new NotFoundError("You are unauthorized to delete this item")
-        );
-      }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Item not found"));
       }

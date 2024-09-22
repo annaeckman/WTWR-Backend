@@ -1,6 +1,6 @@
 const { Joi, celebrate } = require("celebrate");
 const validator = require("validator");
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 
 // validation for avatar and item image URLs
 const validateURL = (value, helpers) => {

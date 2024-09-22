@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const itemRouter = require("./clothingItems");
 const userRouter = require("./users");
-const { NotFoundError } = require("../utils/errors");
+const { NotFoundError } = require("../utils/NotFoundError");
 const { createUser, loginUser } = require("../controllers/users");
 const {
   validateRegisterBody,
@@ -14,7 +14,7 @@ router.use("/items", itemRouter);
 router.post("/signin", validateLoginBody, loginUser);
 router.post("/signup", validateRegisterBody, createUser);
 
-router.use((req, res) => {
+router.use((req, res, next) => {
   next(new NotFoundError("requested resource not found"));
 });
 
