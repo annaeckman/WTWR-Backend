@@ -3,11 +3,12 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { errors } = require("celebrate");
 require("dotenv").config();
+const { limiter } = require("./utils/rate-limit");
+const helmet = require("helmet");
 const mainRouter = require("./routes/index");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-const { limiter } = require("./utils/rate-limit");
-const helmet = require("helmet");
+
 // how to apply the limiter to each request in app?
 // where exactly is it added as a parameter?
 
@@ -18,6 +19,10 @@ mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {})
   .catch(console.error);
+
+app.use(helmet());
+
+app.use(limiter);
 
 // JSON parsing middleware
 app.use(express.json());

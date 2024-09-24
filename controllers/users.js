@@ -48,9 +48,8 @@ const createUser = (req, res, next) => {
         return next(
           new ConflictError("An account exists already with this email")
         );
-      } else {
-        next(err);
       }
+      return next(err);
     });
 };
 
@@ -77,9 +76,8 @@ const loginUser = (req, res, next) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
         return next(new UnauthorizedError("Invalid email or password"));
-      } else {
-        next(err);
       }
+      return next(err);
     });
 };
 
@@ -94,9 +92,8 @@ const getCurrentUser = (req, res, next) => {
       }
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid data provided"));
-      } else {
-        next(err);
       }
+      return next(err);
     });
 };
 
@@ -115,9 +112,8 @@ const updateUser = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Item not found"));
-      } else {
-        next(err);
       }
+      return next(err);
     });
 };
 
